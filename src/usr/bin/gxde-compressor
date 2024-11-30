@@ -36,7 +36,6 @@ extract_file() {
   # Loop through each file and extract it individually
   for file in "$@"; do
     case "$tool" in
-  case "$tool" in
     "deepin-compressor")
       "$tool" "$file" extract
       ;;
