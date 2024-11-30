@@ -34,29 +34,28 @@ extract_file() {
   shift  # Remove the tool from the arguments, leaving only files
 
   # Loop through each file and extract it individually
-  for file in "$@"; do
     case "$tool" in
     "deepin-compressor")
-      "$tool" "$file" extract
+      "$tool" "$@" extract
       ;;
     "ark")
-      "$tool" "$file"
+      "$tool" "$@"
       ;;
     "engrampa")
-      "$tool" -f "$file"
+      "$tool" -f "$@"
       ;;
     "file-roller")
-      "$tool" -f "$file"
+      "$tool" -f "$@"
       ;;
     "gxde-shell-compressor")
-      "$tool" -f "$file"
+      "$tool" -f "$@"
       ;;
     *)
       log.error "Unsupported tool: $tool"
       exit 1
       ;;
   esac
- done
+
 }
 
 # Function to extract here with the selected tool
@@ -65,29 +64,29 @@ extract_here() {
   shift  # Remove the tool from the arguments, leaving only files
 
   # Loop through each file and extract it individually
-  for file in "$@"; do
+
     case "$tool" in
       "deepin-compressor")
-        "$tool" "$file" extract_here
+        "$tool" "$@" extract_here
         ;;
       "ark")
-        "$tool" --batch -o "$(dirname "$file")" "$file"
+        "$tool" --batch -o "$(dirname "$1")" "$@"
         ;;
       "engrampa")
-        "$tool" -h "$file"
+        "$tool" -h "$@"
         ;;
       "file-roller")
-        "$tool" -h "$file"
+        "$tool" -h "$@"
         ;;
       "gxde-shell-compressor")
-        "$tool" -h "$file"
+        "$tool" -h "$@"
         ;;
       *)
         log.error "Unsupported tool: $tool"
         exit 1
         ;;
     esac
-  done
+
 }
 
 
