@@ -43,13 +43,13 @@ extract_file() {
       "$tool" "$file"
       ;;
     "engrampa")
-      "$tool" -e "$file"
+      "$tool" -f "$file"
       ;;
     "file-roller")
-      "$tool" -e "$file"
+      "$tool" -f "$file"
       ;;
     "gxde-shell-compressor")
-      "$tool" -e "$file"
+      "$tool" -f "$file"
       ;;
     *)
       log.error "Unsupported tool: $tool"
