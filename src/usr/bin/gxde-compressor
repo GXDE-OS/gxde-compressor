@@ -1,0 +1,149 @@
+#!/bin/bash
+
+# Logging functions
+log.warn() { echo -e "[\e[33mWARN\e[0m]:  \e[1m$*\e[0m"; }
+log.error() { echo -e "[\e[31mERROR\e[0m]: \e[1m$*\e[0m"; }
+log.info() { echo -e "[\e[96mINFO\e[0m]:  \e[1m$*\e[0m"; }
+log.debug() { echo -e "[\e[32mDEBUG\e[0m]: \e[1m$*\e[0m"; }
+
+log.info "This is a wrapper script for file compression tools."
+
+# Define the available commands in order of priority
+declare -a COMPRESSION_TOOLS=("gxde-shell-compressor" "deepin-compressor" "ark" "engrampa" "file-roller")
+
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" &>/dev/null
+}
+
+# Select the best available tool based on priority
+select_tool() {
+  for tool in "${COMPRESSION_TOOLS[@]}"; do
+    if command_exists "$tool"; then
+      echo "$tool"
+      return
+    fi
+  done
+  log.error "No supported compression tool found!"
+  exit 1
+}
+
+# Function to extract with the selected tool
+extract_file() {
+  local tool="$1"
+  shift  # Remove the tool from the arguments, leaving only files
+
+  # Loop through each file and extract it individually
+  for file in "$@"; do
+    case "$tool" in
+  case "$tool" in
+    "deepin-compressor")
+      "$tool" "$file" extract
+      ;;
+    "ark")
+      "$tool" "$file"
+      ;;
+    "engrampa")
+      "$tool" -e "$file"
+      ;;
+    "file-roller")
+      "$tool" -e "$file"
+      ;;
+    "gxde-shell-compressor")
+      "$tool" -e "$file"
+      ;;
+    *)
+      log.error "Unsupported tool: $tool"
+      exit 1
+      ;;
+  esac
+ done
+}
+
+# Function to extract here with the selected tool
+extract_here() {
+  local tool="$1"
+  shift  # Remove the tool from the arguments, leaving only files
+
+  # Loop through each file and extract it individually
+  for file in "$@"; do
+    case "$tool" in
+      "deepin-compressor")
+        "$tool" "$file" extract_here
+        ;;
+      "ark")
+        "$tool" --batch -o "$(dirname "$file")" "$file"
+        ;;
+      "engrampa")
+        "$tool" -h "$file"
+        ;;
+      "file-roller")
+        "$tool" -h "$file"
+        ;;
+      "gxde-shell-compressor")
+        "$tool" -h "$file"
+        ;;
+      *)
+        log.error "Unsupported tool: $tool"
+        exit 1
+        ;;
+    esac
+  done
+}
+
+
+# Function to compress a file with the selected tool
+compress_file() {
+  local tool="$1"
+
+  case "$tool" in
+    "deepin-compressor")
+      "$tool" ${@:2} compress 
+      ;;
+    "ark")
+      "$tool" --add --dialog "${@:2}"
+      ;;
+    "engrampa")
+      "$tool" -d  "${@:2}"
+      ;;
+    "file-roller")
+      "$tool" -d  "${@:2}"
+      ;;
+    "gxde-shell-compressor")
+      "$tool" -d  "${@:2}"
+      ;;
+    *)
+      log.error "Unsupported tool: $tool"
+      exit 1
+      ;;
+  esac
+}
+
+# Main logic to handle command-line arguments
+if [[ "$1" == "-f" ]] || [[ "$1" == "--extract" ]]; then
+  tool=$(select_tool)
+  log.info "The selected tool is $tool, now launching it"
+  log.info "--------------------------------------------------------------------------"
+  extract_file "$tool" "${@:2}"
+  
+elif [[ "$1" == "-h" ]] || [[ "$1" == "--extract-here" ]]; then
+  tool=$(select_tool)
+  log.info "The selected tool is $tool, now launching it"
+  log.info "--------------------------------------------------------------------------"
+  extract_here "$tool" "${@:2}"
+  
+elif [[ "$1" == "-d" ]] || [[ "$1" == "--compress" ]]; then
+  if [[ -z "$2" ]]; then
+    log.warn "Missing arguments. Usage: -d <file> "
+  fi
+  tool=$(select_tool)
+  log.info "The selected tool is $tool, now compressing file"
+  log.info "--------------------------------------------------------------------------"
+  compress_file "$tool" "${@:2}"
+  
+else
+  log.warn "No valid option provided. Usage: -f <file> or -h <file> or -d <file> <output_file>."
+  tool=$(select_tool)
+  log.info "The selected tool is $tool, now launching it directly without any args."
+  $tool
+fi

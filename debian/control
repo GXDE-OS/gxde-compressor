@@ -1,0 +1,18 @@
+Source: gxde-compressor
+Section: unknown
+Priority: optional
+Maintainer: shenmo <shenmo@spark-app.store>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.5.1
+Homepage: <insert the upstream URL, if relevant>
+Rules-Requires-Root: no
+#Vcs-Git: https://salsa.debian.org/debian/gxde-compressor.git
+#Vcs-Browser: https://salsa.debian.org/debian/gxde-compressor
+
+Package: gxde-compressor
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends},gxde-shell-compressor
+Recommends: deepin-compressor | file-roller | engrampa | ark
+Description: GXDE Compressor is a general wrapper for DCompressor/Ark/Engrampa/file-roller/garma
+ GXDE Compressor is a general wrapper for DCompressor/Ark/Engrampa/file-roller/garma
