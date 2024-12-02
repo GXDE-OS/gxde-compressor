@@ -1,5 +1,5 @@
 Source: gxde-compressor
-Section: unknown
+Section: utils
 Priority: optional
 Maintainer: shenmo <shenmo@spark-app.store>
 Build-Depends: debhelper-compat (= 13)
@@ -13,6 +13,6 @@ Package: gxde-compressor
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends},gxde-shell-compressor | deepin-compressor | file-roller | engrampa | ark
-Recommends: deepin-compressor
+Recommends: gxde-shell-compressor,deepin-compressor
 Description: GXDE Compressor is a general wrapper for DCompressor/Ark/Engrampa/file-roller/garma
  GXDE Compressor is a general wrapper for DCompressor/Ark/Engrampa/file-roller/garma
