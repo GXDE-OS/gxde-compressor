@@ -1,6 +1,7 @@
-gxde-compressor (1.2.3) UNRELEASED; urgency=low
+gxde-compressor (1.4.0) UNRELEASED; urgency=low
 
   * fix: 参数一个一个传的问题
   * adjust: Now use dcompressor as default when compress
+  * adjust: Now use dcompressor as default when extract
 
  -- shenmo <shenmo@spark-app.store>  Sat, 30 Nov 2024 21:20:21 +0800
