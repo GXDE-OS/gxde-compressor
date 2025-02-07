@@ -9,7 +9,7 @@ log.debug() { echo -e "[\e[32mDEBUG\e[0m]: \e[1m$*\e[0m"; }
 log.info "This is a wrapper script for file compression tools."
 
 # Define the available commands for extraction (prioritize gxde-shell-compressor)
-declare -a EXTRACTION_TOOLS=("deepin-compressor" "gxde-shell-compressor" "ark" "engrampa" "file-roller")
+declare -a EXTRACTION_TOOLS=("gxde-shell-compressor" "deepin-compressor"  "ark" "engrampa" "file-roller")
 
 # Define the available commands for compression (prioritize deepin-compressor)
 declare -a COMPRESSION_TOOLS=("deepin-compressor" "gxde-shell-compressor" "ark" "engrampa" "file-roller")
