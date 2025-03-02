@@ -55,7 +55,13 @@ select_tool() {
 extract_file() {
   local tool="$1"
   shift  # Remove the tool from the arguments, leaving only files
-
+        if [[ "$1" == *deb ]]; then
+            if command_exists "gxde-shell-compressor"; then
+                log.info ".deb file detected. Use gxde-shell-compressor to override."
+                echo ""--------------------------------------------------------------------------""
+                tool="gxde-shell-compressor"
+            fi
+        fi
   case "$tool" in
     "deepin-compressor")
       "$tool" "$@" extract
@@ -83,7 +89,13 @@ extract_file() {
 extract_here() {
   local tool="$1"
   shift  # Remove the tool from the arguments, leaving only files
-
+        if [[ "$1" == *deb ]]; then
+            if command_exists "gxde-shell-compressor"; then
+                log.info ".deb file detected. Use gxde-shell-compressor to override."
+                echo ""--------------------------------------------------------------------------""
+                tool="gxde-shell-compressor"
+            fi
+        fi
   case "$tool" in
     "deepin-compressor")
       "$tool" "$@" extract_to_specifypath
@@ -147,25 +159,15 @@ compress_file() {
       ;;
   esac
 }
-check_deb_and_select_tool() {
-        if [[ "$1" == *.deb ]]; then
-            if command_exists "gxde-shell-compressor"; then
-                echo "gxde-shell-compressor"
-                return
-            fi
-        fi
-    # 无.deb文件则按原顺序选择工具
-    select_tool "${EXTRACTION_TOOLS[@]}"
-}
 # Main logic to handle command-line arguments
 if [[ "$1" == "-f" ]] || [[ "$1" == "--extract" ]]; then
-  tool=$(check_deb_and_select_tool "${EXTRACTION_TOOLS[@]}")
+  tool=$(select_tool "${EXTRACTION_TOOLS[@]}")
   log.info "The selected tool is $tool, now launching it"
   log.info "--------------------------------------------------------------------------"
   extract_file "$tool" "${@:2}"
   
 elif [[ "$1" == "-h" ]] || [[ "$1" == "--extract-here" ]]; then
-  tool=$(check_deb_and_select_tool "${EXTRACTION_TOOLS[@]}")
+  tool=$(select_tool "${EXTRACTION_TOOLS[@]}")
   log.info "The selected tool is $tool, now launching it"
   log.info "--------------------------------------------------------------------------"
   extract_here "$tool" "${@:2}"
@@ -174,7 +176,7 @@ elif [[ "$1" == "-d" ]] || [[ "$1" == "--compress" ]]; then
   if [[ -z "$2" ]]; then
     log.warn "Missing arguments. Usage: -d <file>"
   fi
-  tool=$(check_deb_and_select_tool "${COMPRESSION_TOOLS[@]}")
+  tool=$(select_tool "${COMPRESSION_TOOLS[@]}")
   log.info "The selected tool is $tool, now compressing file"
   log.info "--------------------------------------------------------------------------"
   compress_file "$tool" "${@:2}"
