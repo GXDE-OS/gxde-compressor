@@ -87,15 +87,20 @@ extract_here() {
   case "$tool" in
     "deepin-compressor")
       "$tool" "$@" extract_to_specifypath
-        (for FILE in "$@"; do
+        for FILE in "$@"; do
         local EXTRACT_DIR
         EXTRACT_DIR=$(dirname "$FILE")
         local TARGET_DIR="$EXTRACT_DIR/$(remove_suffix $(basename "$FILE"))"
         if [[ "$#" -lt "2" ]];then
-            xdg-open ${TARGET_DIR}
+            xdg-open "${TARGET_DIR}"
+        else
+            MORE_THAN_ONE="1"
         fi
     done
-    )
+    
+        if [[ "${MORE_THAN_ONE}" == "1" ]];then
+            xdg-open "${EXTRACT_DIR}/$(basename ${EXTRACT_DIR})"
+        fi
       ;;
     "ark")
       "$tool" --batch -o "$(dirname "$1")" "$@"
