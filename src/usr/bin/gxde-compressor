@@ -1,4 +1,23 @@
 #!/bin/bash
+remove_suffix() {
+    local filename="$1"
+    # 常见压缩后缀名列表
+    local suffixes=(
+        ".tar.gz" ".tar.bz2" ".tar.xz"
+        ".gz" ".bz2" ".xz" ".zip" ".rar" ".7z"
+    )
+    
+    # 检查是否匹配常见压缩后缀
+    for suffix in "${suffixes[@]}"; do
+        if [[ "$filename" == *"$suffix" ]]; then
+            echo "${filename%"$suffix"}"
+            return
+        fi
+    done
+    
+    # 如果没有匹配，去掉最后一个点之后的内容
+    echo "${filename%.*}"
+}
 
 # Logging functions
 log.warn() { echo -e "[\e[33mWARN\e[0m]:  \e[1m$*\e[0m"; }
@@ -9,7 +28,7 @@ log.debug() { echo -e "[\e[32mDEBUG\e[0m]: \e[1m$*\e[0m"; }
 log.info "This is a wrapper script for file compression tools."
 
 # Define the available commands for extraction (prioritize gxde-shell-compressor)
-declare -a EXTRACTION_TOOLS=("gxde-shell-compressor" "deepin-compressor"  "ark" "engrampa" "file-roller")
+declare -a EXTRACTION_TOOLS=( "deepin-compressor" "gxde-shell-compressor" "ark" "engrampa" "file-roller")
 
 # Define the available commands for compression (prioritize deepin-compressor)
 declare -a COMPRESSION_TOOLS=("deepin-compressor" "gxde-shell-compressor" "ark" "engrampa" "file-roller")
@@ -67,7 +86,16 @@ extract_here() {
 
   case "$tool" in
     "deepin-compressor")
-      "$tool" "$@" extract_here
+      "$tool" "$@" extract_to_specifypath
+        (for FILE in "$@"; do
+        local EXTRACT_DIR
+        EXTRACT_DIR=$(dirname "$FILE")
+        local TARGET_DIR="$EXTRACT_DIR/$(remove_suffix $(basename "$FILE"))"
+        if [[ "$#" -lt "2" ]];then
+            xdg-open ${TARGET_DIR}
+        fi
+    done
+    )
       ;;
     "ark")
       "$tool" --batch -o "$(dirname "$1")" "$@"
