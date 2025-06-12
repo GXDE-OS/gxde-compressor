@@ -51,32 +51,35 @@ select_tool() {
   exit 1
 }
 
-# Function to extract with the selected tool
+# 解压文件
 extract_file() {
   local tool="$1"
-  shift  # Remove the tool from the arguments, leaving only files
-        if [[ "$1" == *deb ]]; then
-            if command_exists "gxde-shell-compressor"; then
-                log.info ".deb file detected. Use gxde-shell-compressor to override."
-                echo ""--------------------------------------------------------------------------""
-                tool="gxde-shell-compressor"
-            fi
-        fi
+  shift
+  local args=("$@")
+
+  if [[ "${args[0]}" == *.deb ]]; then
+    if command_exists "gxde-shell-compressor"; then
+      log.info ".deb file detected. Use gxde-shell-compressor to override."
+      echo "--------------------------------------------------------------------------"
+      tool="gxde-shell-compressor"
+    fi
+  fi
+
   case "$tool" in
     "deepin-compressor")
-      "$tool" "$@" extract
+      "$tool" "${args[@]}" extract
       ;;
     "ark")
-      "$tool" "$@"
+      "$tool" "${args[@]}"
       ;;
     "engrampa")
-      "$tool" -f "$@"
+      "$tool" -f "${args[@]}"
       ;;
     "file-roller")
-      "$tool" -f "$@"
+      "$tool" -f "${args[@]}"
       ;;
     "gxde-shell-compressor")
-      "$tool" -f "$@"
+      "$tool" -f "${args[@]}"
       ;;
     *)
       log.error "Unsupported tool: $tool"
@@ -85,46 +88,48 @@ extract_file() {
   esac
 }
 
-# Function to extract here with the selected tool
+# 解压到当前目录
 extract_here() {
   local tool="$1"
-  shift  # Remove the tool from the arguments, leaving only files
-        if [[ "$1" == *deb ]]; then
-            if command_exists "gxde-shell-compressor"; then
-                log.info ".deb file detected. Use gxde-shell-compressor to override."
-                echo ""--------------------------------------------------------------------------""
-                tool="gxde-shell-compressor"
-            fi
-        fi
+  shift
+  local args=("$@")
+
+  if [[ "${args[0]}" == *.deb ]]; then
+    if command_exists "gxde-shell-compressor"; then
+      log.info ".deb file detected. Use gxde-shell-compressor to override."
+      echo "--------------------------------------------------------------------------"
+      tool="gxde-shell-compressor"
+    fi
+  fi
+
   case "$tool" in
     "deepin-compressor")
-      "$tool" "$@" extract_to_specifypath
-        for FILE in "$@"; do
+      "$tool" "${args[@]}" extract_to_specifypath
+      for FILE in "${args[@]}"; do
         local EXTRACT_DIR
         EXTRACT_DIR=$(dirname "$FILE")
-        local TARGET_DIR="$EXTRACT_DIR/$(remove_suffix $(basename "$FILE"))"
-        if [[ "$#" -lt "2" ]];then
-            xdg-open "${TARGET_DIR}"
+        local TARGET_DIR="$EXTRACT_DIR/$(remove_suffix "$(basename "$FILE")")"
+        if [[ "${#args[@]}" -lt 2 ]]; then
+          xdg-open "${TARGET_DIR}"
         else
-            MORE_THAN_ONE="1"
+          MORE_THAN_ONE="1"
         fi
-    done
-    
-        if [[ "${MORE_THAN_ONE}" == "1" ]];then
-            xdg-open "${EXTRACT_DIR}/$(basename ${EXTRACT_DIR})"
-        fi
+      done
+      if [[ "${MORE_THAN_ONE}" == "1" ]]; then
+        xdg-open "${EXTRACT_DIR}/$(basename "${EXTRACT_DIR}")"
+      fi
       ;;
     "ark")
-      "$tool" --batch -o "$(dirname "$1")" "$@"
+      "$tool" --batch -o "$(dirname "${args[0]}")" "${args[@]}"
       ;;
     "engrampa")
-      "$tool" -h "$@"
+      "$tool" -h "${args[@]}"
       ;;
     "file-roller")
-      "$tool" -h "$@"
+      "$tool" -h "${args[@]}"
       ;;
     "gxde-shell-compressor")
-      "$tool" -h "$@"
+      "$tool" -h "${args[@]}"
       ;;
     *)
       log.error "Unsupported tool: $tool"
@@ -133,25 +138,29 @@ extract_here() {
   esac
 }
 
+
 # Function to compress a file with the selected tool
+# 压缩文件（修复空格路径和多个文件的问题）
 compress_file() {
   local tool="$1"
+  shift
+  local args=("$@")
 
   case "$tool" in
     "deepin-compressor")
-      "$tool" ${@:2} compress
+      "$tool" "${args[@]}" compress
       ;;
     "ark")
-      "$tool" --add --dialog "${@:2}"
+      "$tool" --add --dialog "${args[@]}"
       ;;
     "engrampa")
-      "$tool" -d "${@:2}"
+      "$tool" -d "${args[@]}"
       ;;
     "file-roller")
-      "$tool" -d "${@:2}"
+      "$tool" -d "${args[@]}"
       ;;
     "gxde-shell-compressor")
-      "$tool" -d "${@:2}"
+      "$tool" -d "${args[@]}"
       ;;
     *)
       log.error "Unsupported tool: $tool"
@@ -159,19 +168,21 @@ compress_file() {
       ;;
   esac
 }
-# Main logic to handle command-line arguments
+
+
+# Main logic
 if [[ "$1" == "-f" ]] || [[ "$1" == "--extract" ]]; then
   tool=$(select_tool "${EXTRACTION_TOOLS[@]}")
   log.info "The selected tool is $tool, now launching it"
   log.info "--------------------------------------------------------------------------"
   extract_file "$tool" "${@:2}"
-  
+
 elif [[ "$1" == "-h" ]] || [[ "$1" == "--extract-here" ]]; then
   tool=$(select_tool "${EXTRACTION_TOOLS[@]}")
   log.info "The selected tool is $tool, now launching it"
   log.info "--------------------------------------------------------------------------"
   extract_here "$tool" "${@:2}"
-  
+
 elif [[ "$1" == "-d" ]] || [[ "$1" == "--compress" ]]; then
   if [[ -z "$2" ]]; then
     log.warn "Missing arguments. Usage: -d <file>"
@@ -180,10 +191,11 @@ elif [[ "$1" == "-d" ]] || [[ "$1" == "--compress" ]]; then
   log.info "The selected tool is $tool, now compressing file"
   log.info "--------------------------------------------------------------------------"
   compress_file "$tool" "${@:2}"
-  
+
 else
   log.warn "No valid option provided. Usage: -f <file> or -h <file> or -d <file> <output_file>."
   tool=$(select_tool "${COMPRESSION_TOOLS[@]}")
   log.info "The selected tool is $tool, now launching it directly without any args."
-  $tool
+  "$tool"
 fi
+

@@ -1,4 +1,4 @@
-gxde-compressor (1.5.0) UNRELEASED; urgency=low
+gxde-compressor (1.6.0) UNRELEASED; urgency=low
 
   * fix: 参数一个一个传的问题
   * adjust: Now use dcompressor as default when compress
