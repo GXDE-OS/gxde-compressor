@@ -1,0 +1,28 @@
+# Maintainer: CharOfString <root@charofstring.cc>
+pkgname=gxde-compressor-git
+pkgver=1.6.0
+pkgrel=1
+pkgdesc='GXDE compressor (wrapper for the available archive tools)'
+arch=('any')
+url="https://github.com/GXDE-OS/gxde-compressor"
+license=('AGPL-3.0-only')
+# debian/control 中的首选项 ・ The first alternative in debian/control.
+depends=('gxde-shell-compressor-git' 'bash')
+optdepends=('file-roller: alternative archive manager'
+            'engrampa: alternative archive manager'
+            'ark: alternative archive manager')
+makedepends=('git')
+provides=('gxde-compressor')
+conflicts=('gxde-compressor')
+source=()
+sha512sums=()
+
+# 直接使用 PKGBUILD 所在的 git 仓库作为源码 ・ Build from the git checkout this PKGBUILD lives in.
+_srcroot() {
+  git -C "$startdir" rev-parse --show-toplevel
+}
+
+package() {
+  # 与 debian/install 相同，src/ 即为安装根目录 ・ Same as debian/install, src/ is the install root.
+  cp -r --no-preserve=ownership "$(_srcroot)/src/." "$pkgdir/"
+}
