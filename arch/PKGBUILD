@@ -1,5 +1,5 @@
 # Maintainer: CharOfString <root@charofstring.cc>
-pkgname=gxde-compressor-git
+pkgname=gxde-compressor
 pkgver=1.6.0
 pkgrel=1
 pkgdesc='GXDE compressor (wrapper for the available archive tools)'
@@ -7,13 +7,14 @@ arch=('any')
 url="https://github.com/GXDE-OS/gxde-compressor"
 license=('AGPL-3.0-only')
 # debian/control 中的首选项 ・ The first alternative in debian/control.
-depends=('gxde-shell-compressor-git' 'bash')
+depends=('gxde-shell-compressor' 'bash')
 optdepends=('file-roller: alternative archive manager'
             'engrampa: alternative archive manager'
             'ark: alternative archive manager')
 makedepends=('git')
-provides=('gxde-compressor')
-conflicts=('gxde-compressor')
+provides=("gxde-compressor-git=$pkgver")
+conflicts=('gxde-compressor-git')
+replaces=('gxde-compressor-git')
 source=()
 sha512sums=()
 
